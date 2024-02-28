@@ -50,7 +50,7 @@ jobs:
           git pull https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git gh-pages
 
           # Remove content & upload latest dist
-          rm -rf .
+          rm -rf *
           cp -r ${{ github.workspace }}/dist/* .
 
           # Push content to gh-pages
