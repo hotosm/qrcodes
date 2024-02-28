@@ -12,20 +12,33 @@ on:
   # Allow manual trigger (workflow_dispatch)
   workflow_dispatch:
 
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow one concurrent deployment
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
 jobs:
   publish:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - uses: pnpm/action-setup@v2
+      - uses: pnpm/action-setup@v3
         with:
           version: 8
 
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 18
           cache: "pnpm"
@@ -39,21 +52,15 @@ jobs:
         working-directory: .
         run: pnpm build
 
-      - name: Upload to GH Pages
-        run: |
-          # Checkout to gh-pages
-          mkdir tmp_pages
-          cd tmp_pages
-          git init --initial-branch=gh-pages
-          git config user.name svchot
-          git config user.email sysadmin@hotosm.org
-          git pull https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git gh-pages
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
 
-          # Remove content & upload latest dist
-          rm -rf *
-          cp -r ${{ github.workspace }}/dist/* .
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # Upload dist repository
+          path: "./dist"
 
-          # Push content to gh-pages
-          git add .
-          git commit -m "docs: update qrcode website to latest"
-          git push --set-upstream https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git HEAD:gh-pages
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
