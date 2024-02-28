@@ -1,0 +1,59 @@
+name: 🚩 Deploy to GH-Pages
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - "*"
+    # Workflow is triggered only if src changes
+    paths:
+      - src/**
+  # Allow manual trigger (workflow_dispatch)
+  workflow_dispatch:
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: "pnpm"
+          cache-dependency-path: "pnpm-lock.yaml"
+
+      - name: Install dependencies
+        working-directory: .
+        run: CI=true pnpm install
+
+      - name: Build Dist
+        working-directory: .
+        run: pnpm build
+
+      - name: Upload to GH Pages
+        run: |
+          # Checkout to gh-pages
+          mkdir tmp_pages
+          cd tmp_pages
+          git init --initial-branch=gh-pages
+          git config user.name svchot
+          git config user.email sysadmin@hotosm.org
+          git pull https://x-access-token:$TOKEN@github.com/${{ github.repository }}.git gh-pages
+
+          # Upload latest components dist
+          mkdir -p dist
+          cp -r ${{ github.workspace }}/dist/* dist/
+
+          # Push content to gh-pages
+          git add .
+          git commit -m "docs: update component dist to latest"
+          git push --set-upstream https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git HEAD:gh-pages
