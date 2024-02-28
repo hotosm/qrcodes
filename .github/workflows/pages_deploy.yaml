@@ -47,13 +47,13 @@ jobs:
           git init --initial-branch=gh-pages
           git config user.name svchot
           git config user.email sysadmin@hotosm.org
-          git pull https://x-access-token:$TOKEN@github.com/${{ github.repository }}.git gh-pages
+          git pull https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git gh-pages
 
-          # Upload latest components dist
-          mkdir -p dist
-          cp -r ${{ github.workspace }}/dist/* dist/
+          # Remove content & upload latest dist
+          rm -rf .
+          cp -r ${{ github.workspace }}/dist/* .
 
           # Push content to gh-pages
           git add .
-          git commit -m "docs: update component dist to latest"
+          git commit -m "docs: update qrcode website to latest"
           git push --set-upstream https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git HEAD:gh-pages
