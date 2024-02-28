@@ -8,7 +8,10 @@ on:
       - "*"
     # Workflow is triggered only if src changes
     paths:
+      - index.html
+      - vite.config.ts
       - src/**
+      - pnpm-lock.yaml
   # Allow manual trigger (workflow_dispatch)
   workflow_dispatch:
 
