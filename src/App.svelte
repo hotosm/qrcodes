@@ -98,8 +98,8 @@
 
 <style>
   .logo {
-    height: 6em;
-    padding: 1.5em;
+    height: 4em;
+    padding: 1em;
     will-change: filter;
     transition: filter 300ms;
   }
