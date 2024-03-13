@@ -79,12 +79,12 @@
 
   <h3>Encode QR Code</h3>
   <textarea rows="10" cols="50" on:input={e => jsonData = e.target.value}></textarea><br>
-  <button on:click={generateQRCode}>Generate QR Code</button>
-  {#if qrCodeDataURL !== null}
-    <button on:click={downloadQRCode}>Download QR Code</button>
+  <hot-button intent="secondary" on:click={generateQRCode}>Generate QR Code</hot-button>
+  {#if qrCodeDataURL !== ''}
+    <hot-button intent="secondary" on:click={downloadQRCode}>Download QR Code</hot-button>
   {/if}
   <br><br>
-  {#if qrCodeDataURL !== null}
+  {#if qrCodeDataURL !== ''}
     <img src={qrCodeDataURL} alt="" />
   {/if}
 
